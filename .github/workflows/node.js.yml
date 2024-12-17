@@ -1,0 +1,38 @@
+name: Build and Push Node.js App to Docker
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow when pushing to the main branch
+
+jobs:
+  # Job to build and push the Docker image
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'  # Set the Node.js version for your app
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Docker image
+      run: |
+        docker build -t yourdockerhubusername/node-app:latest .
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}  # Store Docker Hub username as a secret
+        password: ${{ secrets.DOCKER_PASSWORD }}  # Store Docker Hub password as a secret
+
+    - name: Push Docker image to Docker Hub
+      run: |
+        docker push yourdockerhubusername/node-app:latest
+
